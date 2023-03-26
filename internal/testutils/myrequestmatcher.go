@@ -3,14 +3,15 @@ package testutils
 import (
 	"fmt"
 	"reflect"
-	"testingmatcher-with-option/internal/model"
+
+	"github.com/golang/mock/gomock"
 )
 
-type Option interface {
-	apply(*myRequestMatcher)
+type Option[T any] interface {
+	apply(*MyMatcher[T])
 }
 
-type myRequestMatcher struct {
+type MyMatcher[T any] struct {
 	Id       string
 	Name     string
 	Datetime string
@@ -22,20 +23,20 @@ type myRequestMatcher struct {
 	Value6   int
 }
 
-type optionFunc func(*myRequestMatcher)
+type optionFunc[T any] func(*MyMatcher[T])
 
-func (f optionFunc) apply(m *myRequestMatcher) {
+func (f optionFunc[T]) apply(m *MyMatcher[T]) {
 	f(m)
 }
 
-func WithValue(attributeName string, value any) Option {
-	return optionFunc(func(m *myRequestMatcher) {
+func WithValue[T any](obj T, attributeName string, value any) Option[T] {
+	return optionFunc[T](func(m *MyMatcher[T]) {
 		SetField(m, attributeName, value)
 	})
 }
 
-func (m *myRequestMatcher) Matches(x interface{}) bool {
-	if req, ok := x.(model.MyRequest); ok {
+func (m *MyMatcher[T]) Matches(x interface{}) bool {
+	if req, ok := x.(T); ok {
 		v := reflect.ValueOf(*m)
 		for i := 0; i < v.NumField(); i++ {
 			field := v.Field(i)
@@ -48,7 +49,7 @@ func (m *myRequestMatcher) Matches(x interface{}) bool {
 	return false
 }
 
-func (m *myRequestMatcher) String() string {
+func (m *MyMatcher[T]) String() string {
 	return "is a MyRequest with custom conditions"
 }
 
@@ -79,4 +80,13 @@ func SetField(obj interface{}, fieldName string, value interface{}) error {
 
 	field.Set(valueValue)
 	return nil
+}
+
+func CreateMyMatcher[T any](obj T, options ...Option[T]) gomock.Matcher {
+	matcher := &MyMatcher[T]{}
+	for _, opt := range options {
+		// we use the apply method to set the values that we want to matchpa
+		opt.apply(matcher)
+	}
+	return matcher
 }
