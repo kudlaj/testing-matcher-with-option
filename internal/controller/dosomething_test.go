@@ -27,8 +27,8 @@ func TestDoSomething(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockService := service.NewMockService(ctrl)
-		mockService.EXPECT().MakeARequest(testutils.CreateMyMatcher(model.MyRequest{},
-			testutils.WithValue(model.MyRequest{}, "Name", "name"),
+		mockService.EXPECT().MakeARequest(testutils.CreateMyMatcher(
+			testutils.WithValue(model.MyRequest{}, "Name", "John Doe"),
 			testutils.WithValue(model.MyRequest{}, "Id", "123"),
 		)).Return(true)
 		resolver := controller.NewResolver(mockService)

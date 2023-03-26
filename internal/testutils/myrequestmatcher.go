@@ -12,15 +12,7 @@ type Option[T any] interface {
 }
 
 type MyMatcher[T any] struct {
-	Id       string
-	Name     string
-	Datetime string
-	Value1   int
-	Value2   int
-	Value3   int
-	Value4   int
-	Value5   int
-	Value6   int
+	Obj T
 }
 
 type optionFunc[T any] func(*MyMatcher[T])
@@ -31,13 +23,13 @@ func (f optionFunc[T]) apply(m *MyMatcher[T]) {
 
 func WithValue[T any](obj T, attributeName string, value any) Option[T] {
 	return optionFunc[T](func(m *MyMatcher[T]) {
-		SetField(m, attributeName, value)
+		SetField(&m.Obj, attributeName, value)
 	})
 }
 
 func (m *MyMatcher[T]) Matches(x interface{}) bool {
 	if req, ok := x.(T); ok {
-		v := reflect.ValueOf(*m)
+		v := reflect.ValueOf(m.Obj)
 		for i := 0; i < v.NumField(); i++ {
 			field := v.Field(i)
 			if !field.IsZero() && field.Interface() != reflect.ValueOf(req).Field(i).Interface() {
@@ -82,7 +74,7 @@ func SetField(obj interface{}, fieldName string, value interface{}) error {
 	return nil
 }
 
-func CreateMyMatcher[T any](obj T, options ...Option[T]) gomock.Matcher {
+func CreateMyMatcher[T any](options ...Option[T]) gomock.Matcher {
 	matcher := &MyMatcher[T]{}
 	for _, opt := range options {
 		// we use the apply method to set the values that we want to matchpa

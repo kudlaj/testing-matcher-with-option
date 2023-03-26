@@ -7,7 +7,7 @@ import (
 func (r *Resolver) DoSomething() bool {
 	res := r.service.MakeARequest(model.MyRequest{
 		Id:       "123",
-		Name:     "name",
+		Name:     "John Doe",
 		Datetime: "2020-01-01 00:00:00",
 		Value1:   1,
 		Value2:   2,
