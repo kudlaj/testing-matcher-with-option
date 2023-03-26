@@ -21,13 +21,14 @@ func TestDoSomething(t *testing.T) {
 		res := resolver.DoSomething()
 		assert.Assert(t, res, true)
 	})
+
 	t.Run("should execute DoSomething call and MakeARequest and check Name and Id with testutils.CreateMyRequestMatcher and return true", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockService := service.NewMockService(ctrl)
 		mockService.EXPECT().MakeARequest(testutils.CreateMyRequestMatcher(
-			testutils.WithName("name"),
-			testutils.WithId("123"),
+			testutils.WithValue("name", "name"),
+			testutils.WithValue("id", "123"),
 		)).Return(true)
 		resolver := controller.NewResolver(mockService)
 		res := resolver.DoSomething()
