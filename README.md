@@ -1,5 +1,8 @@
 # testing-matcher-with-option
 
+Have you ever found yourself in a situation where, while writing tests with Go, you have to pass a lot of information to the mock function?
+This code code can help you to create you custom Matchers with one simple instruction. You can just test the attributes that are importat for your test and ignore the rest without having to create a custom Matcher.
+
 ## Usage
 
 Creating Custom Matchers
