@@ -3,6 +3,7 @@ package controller_test
 import (
 	"testing"
 	"testingmatcher-with-option/internal/controller"
+	"testingmatcher-with-option/internal/model"
 	"testingmatcher-with-option/internal/service"
 	"testingmatcher-with-option/internal/testutils"
 
@@ -21,13 +22,14 @@ func TestDoSomething(t *testing.T) {
 		res := resolver.DoSomething()
 		assert.Assert(t, res, true)
 	})
+
 	t.Run("should execute DoSomething call and MakeARequest and check Name and Id with testutils.CreateMyRequestMatcher and return true", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockService := service.NewMockService(ctrl)
-		mockService.EXPECT().MakeARequest(testutils.CreateMyRequestMatcher(
-			testutils.WithName("name"),
-			testutils.WithId("123"),
+		mockService.EXPECT().MakeARequest(testutils.CreateMyMatcher(
+			testutils.WithValue(model.MyRequest{}, "Name", "John Doe"),
+			testutils.WithValue(model.MyRequest{}, "Id", "123"),
 		)).Return(true)
 		resolver := controller.NewResolver(mockService)
 		res := resolver.DoSomething()
